@@ -2,15 +2,10 @@
     keyVersion: "version",
     url: "chrome://extensions/",
     contextMenuId: undefined,
-    contextMenuText: "Close Tabs",
     homePageUrl: "http://tejji.com/",
     temp: {},
+
     init: function () {
-        //Initialize the icon
-        //chrome.browserAction.setIcon({ path: localStorage["currentIconPath"] });
-        //o.initIcon();
-        //b.initBrowserAction();
-        //chrome.tabs.getCurrent(function (tab) { o.initContextMenu(tab); });
         o.initContextMenu();
         b.initOmniBox();
         b.initInstall();
@@ -21,14 +16,6 @@
             chrome.tabs.update(tab.id, { url: url });
         });
     },
-
-
-
-    //    initBrowserAction: function () {
-    //        chrome.browserAction.onClicked.addListener(function (tab) {
-    //            b.userOnClick();
-    //        });
-    //    },
 
     initInstall: function () {
         function onInstall() {
@@ -82,7 +69,6 @@
     // A generic onclick callback function.
     userOnClick: function (info, tab) {
         chrome.tabs.create({ url: b.url });
-        //chrome.tabs.executeScript(null, { file: "js/content-script.js" });
     },
 
     closeTabsToTheLeft: function (info, tab) {
@@ -97,6 +83,7 @@
             }
         });
     },
+
     closeTabsToTheRight: function (info, tab) {
         b.temp.currentTab = tab;
         chrome.tabs.getAllInWindow(null, function (tabs) {
@@ -109,6 +96,7 @@
             }
         });
     },
+
     closeOtherTabs: function (info, tab) {
         b.temp.currentTab = tab;
         chrome.tabs.getAllInWindow(null, function (tabs) {
@@ -119,12 +107,15 @@
             }
         });
     },
+
     closeCurrentTab: function (info, tab) {
         chrome.tabs.remove(tab.id, null);
     },
+
     getDomain: function (url) {
         return url.split(/\/+/g)[1];
     },
+
     closeTabsFromDomain: function (info, tab) {
         b.temp.currentTab = tab;
         b.temp.currentDomain = b.getDomain(tab.url);
@@ -137,6 +128,7 @@
             }
         });
     },
+
     closeTabsFromOtherDomain: function (info, tab) {
         b.temp.currentTab = tab;
         b.temp.currentDomain = b.getDomain(tab.url);
@@ -149,20 +141,22 @@
             }
         });
     },
+
     closeWindow: function (info, tab) {
         chrome.windows.getCurrent(function (window) {
             chrome.windows.remove(window.id, null);
         });
     },
+
     openOptions: function (info, tab) {
         chrome.tabs.create({ url: "options.htm" });
     },
+
     initContextMenu: function (tab) {
         if (b.contextMenuId !== undefined) return;
         var contexts = ["all"];
-        //var contexts = ["page", "selection", "link", "editable", "image", "video", "audio"];
-        var title = b.contextMenuText;
         var domain = ""
+
         if (tab !== undefined) domain = b.getDomain(tab.url);
         b.contextMenuId = chrome.contextMenus.create({ "title": title, "contexts": contexts
             //,"onclick": b.userOnClick
@@ -204,7 +198,6 @@
     initOmniBox: function () {
         chrome.omnibox.onInputChanged.addListener(
         function (text, suggest) {
-            //console.log('inputChanged: ' + text);
             suggest([
                 { content: "tejji.com", description: "tejji.com" }
             ]);

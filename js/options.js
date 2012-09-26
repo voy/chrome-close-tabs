@@ -80,21 +80,6 @@
     },
 
     init: function () {
-        //o.initIcon();
-//        $("#dIcon input[type='image']").click(function () {
-//            var iconPath = $(this).attr("src");
-//            o.setIcon(iconPath);
-//        });
-        //        $('#bFile').change(function (e) {
-        //            $in = $(this);
-        //            $in.next().html($in.val());
-        //            var iconPath = $(this).val();
-        //            start(iconPath);
-        //            //o.setIcon(iconPath);
-        //        });
-        //$('#bFile').change(o.loadLocalIcon);
-
-
         b = chrome.extension.getBackgroundPage().b;
         o.initContextMenu();
         $("#cCMenu").change(function () {
@@ -104,13 +89,6 @@
                 o.removeContextMenu();
             }
         });
-//        $("#cTBtn").change(function () {
-//            if ($(this).is(':checked')) {
-//                o.initIcon();
-//            } else {
-//                o.setIcon("");
-//            }
-//        });
 
         $("#bReset").click(function () {
             o.reset();
@@ -119,7 +97,6 @@
         $("#bClose").click(function () {
             o.closeTab();
         });
-
     }
 };
 
