@@ -14,9 +14,6 @@
         "32":  "img/icon32.png",
         "48":  "img/icon48.png"
     },
-    "omnibox": {
-        "keyword": "t"
-    },
     "options_page": "options.htm",
     "permissions": ["*://*/*", "contextMenus", "unlimitedStorage", "tabs"],
     "update_url": "http://clients2.google.com/service/update2/crx",

@@ -7,7 +7,6 @@
 
     init: function () {
         o.initContextMenu();
-        b.initOmniBox();
         b.initInstall();
     },
 
@@ -19,12 +18,10 @@
 
     initInstall: function () {
         function onInstall() {
-            console.log("Extension Installed");
             openHomePage();
         }
 
         function onUpdate() {
-            console.log("Extension Updated");
             openHomePage();
         }
 
@@ -33,7 +30,6 @@
                 var isHomeTab = false;
                 for (var i = 0, tab; tab = tabs[i]; i++) {
                     if (tab.url === b.homePageUrl) {
-                        //chrome.tabs.update(tab.id, { selected: true });
                         isHomeTab = true;
                         break;
                     }
@@ -192,19 +188,6 @@
         addItem("Close tabs from other domain" + domain, b.closeTabsFromOtherDomain);
         addItem("Close window", b.closeWindow);
         addItem("Options", b.openOptions);
-    },
-
-    initOmniBox: function () {
-        chrome.omnibox.onInputChanged.addListener(
-        function (text, suggest) {
-            suggest([
-                { content: "tejji.com", description: "tejji.com" }
-            ]);
-        });
-
-        chrome.omnibox.onInputEntered.addListener(function (text) {
-            b.navigate("http://tejji.com");
-        });
     }
 };
 
