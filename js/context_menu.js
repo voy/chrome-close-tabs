@@ -118,14 +118,14 @@ ContextMenu.prototype = {
             contexts: this.contexts
         });
 
-        this.addItem('Other tabs', this.tabTests.otherTabs);
-        this.addItem('Tabs to the ←', this.tabTests.tabsToTheLeft);
-        this.addItem('Tabs to the →', this.tabTests.tabsToTheRight);
+        this.addItem('Other', this.tabTests.otherTabs);
+        this.addItem('To the ←', this.tabTests.tabsToTheLeft);
+        this.addItem('To the →', this.tabTests.tabsToTheRight);
         this.addSeparator();
 
-        this.addItem('Tabs from domain', this.tabTests.tabsFromDomain);
-        this.addItem('Other tabs from domain', this.tabTests.otherTabsFromDomain);
-        this.addItem('Tabs from other domain', this.tabTests.tabsFromOtherDomain);
+        this.addItem('From domain', this.tabTests.tabsFromDomain);
+        this.addItem('Other from domain', this.tabTests.otherTabsFromDomain);
+        this.addItem('From other domain', this.tabTests.tabsFromOtherDomain);
         this.addSeparator();
 
         this.addItem('Options', this.openOptions);
