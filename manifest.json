@@ -1,0 +1,21 @@
+{
+   "background_page": "background.htm",
+   "description": "Context menu to close - tabs to the left, tabs to the right, other tabs, tabs from same domain, current tab, window and more",
+   "homepage_url": "http://tejji.com/",
+   "icons": {
+      "128": "img/icon128.png",
+      "16": "img/icon16.png",
+      "19": "img/icon19.png",
+      "32": "img/icon32.png",
+      "48": "img/icon48.png"
+   },
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDMIYmBWO99R1+l9CugZoQ3xUM+IvYKuQO/GGmRYlLEsi/tL3PrMM82SGPhA3zhWsYPRf6uhCfhPsGp3m4+Bdt3+9n9tt3jc14wzUL9hjAFlB8zytshp0EtGOIaVDdE0ChTlQmwTQWVRMq3jwhcktUMjyS4A4spOrqkDMnvGfZSFwIDAQAB",
+   "name": "Close Tabs",
+   "omnibox": {
+      "keyword": "t"
+   },
+   "options_page": "options.htm",
+   "permissions": [ "*://*", "contextMenus", "unlimitedStorage", "tabs" ],
+   "update_url": "http://clients2.google.com/service/update2/crx",
+   "version": "1.0"
+}
