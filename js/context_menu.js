@@ -128,11 +128,11 @@ ContextMenu.prototype = {
         this.addItem('From other domain', this.tabTests.tabsFromOtherDomain);
         this.addSeparator();
 
-        this.addItem('Options', this.openOptions);
+        this.addItem('About', this.openAbout);
     },
 
-    openOptions: function(info, tab) {
-        this.chrome.tabs.create({ url: 'options.htm' });
+    openAbout: function(info, tab) {
+        this.chrome.tabs.create({ url: 'about.html' });
     }
 };
 

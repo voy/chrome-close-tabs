@@ -13,7 +13,6 @@
         "24":  "img/close-tabs-24.png",
         "16":  "img/close-tabs-16.png"
     },
-    "options_page": "options.htm",
     "permissions": ["*://*/*", "contextMenus", "tabs"],
     "update_url": "http://clients2.google.com/service/update2/crx"
 }
