@@ -143,7 +143,7 @@ ContextMenu.prototype = {
     }
 };
 
-// don't instantiate anything during test runs
+// only instantiate when in chrome environment
 if (typeof chrome !== 'undefined') {
     var contextMenu = new ContextMenu();
     contextMenu.init();
@@ -151,5 +151,5 @@ if (typeof chrome !== 'undefined') {
 
 // only export when run from node
 if (typeof module !== 'undefined') {
-   module.exports = ContextMenu;
+    module.exports = ContextMenu;
 }
