@@ -119,8 +119,8 @@ ContextMenu.prototype = {
         });
 
         this.addItem('Other tabs', this.tabTests.otherTabs);
-        this.addItem('Tabs to the left', this.tabTests.tabsToTheLeft);
-        this.addItem('Tabs to the right', this.tabTests.tabsToTheRight);
+        this.addItem('Tabs to the ←', this.tabTests.tabsToTheLeft);
+        this.addItem('Tabs to the →', this.tabTests.tabsToTheRight);
         this.addSeparator();
 
         this.addItem('Tabs from domain', this.tabTests.tabsFromDomain);
