@@ -14,4 +14,6 @@ You will need mocha and sinon to run tests:
     $ npm install -g mocha
     $ npm install -g sinon
 
+The icon used is from the Oxygen Icon set by the Oxygen Team.
+
 Vojtech Jasny <voy@voy.cz>
