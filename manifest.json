@@ -1,11 +1,11 @@
 {
     "manifest_version": 2,
-    "version": "1.0"
+    "version": "1.0",
     "name": "Close Tabs",
     "description": "Context menu to close - tabs to the left, tabs to the right, other tabs, tabs from same domain, current tab, window and more",
     "homepage_url": "http://tejji.com/",
     "background": {
-		"scripts": ["js/jquery.min.js", "js/options.js", "js/background.js"]
+		"scripts": ["lib/jquery.min.js", "js/options.js", "js/background.js"]
     },
     "icons": {
         "128": "img/icon128.png",
@@ -16,5 +16,5 @@
     },
     "options_page": "options.htm",
     "permissions": ["*://*/*", "contextMenus", "unlimitedStorage", "tabs"],
-    "update_url": "http://clients2.google.com/service/update2/crx",
+    "update_url": "http://clients2.google.com/service/update2/crx"
 }
