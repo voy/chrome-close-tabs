@@ -28,9 +28,9 @@ ContextMenu.prototype = {
 
     getWindowTabs: function(callback) {
         this.chrome.tabs.query({ windowId: this.chrome.windows.WINDOW_ID_CURRENT }, function(tabs) {
-            var result = tabs.map(this.enrichTab);
+            var result = tabs.map(this.enrichTab, this);
             callback(result);
-        });
+        }.bind(this));
     },
 
     tabTests: {
@@ -78,16 +78,17 @@ ContextMenu.prototype = {
      * that test against all tabs in the current window and closes those tabs for
      * which the test function returns true.
      */
-    getClickHandler: function(tabTest) {
-        var contextMenu = this;
-
-        function clickHandler(info, tab) {
-            currentTab = b.enrichTab(tab)
+    getClickHandler: function(tabTest, callback) {
+        var clickHandler = function(info, tab, callback) {
             this.getWindowTabs(function(allTabs) {
-                var tabsToClose = contextMenu.closeTabs(currentTab, allTabs, tabTest);
-                contextMenu._closeTabs(tabsToClose);
-            });
-        }
+                var currentTab = this.enrichTab(tab);
+
+                var tabsToClose = this.getTabsToClose(currentTab, allTabs, tabTest);
+                this._closeTabs(tabsToClose);
+
+                callback && callback();
+            }.bind(this));
+        }.bind(this);
 
         return clickHandler;
     },
@@ -97,7 +98,7 @@ ContextMenu.prototype = {
             title: title,
             contexts: this.contexts,
             parentId: this.contextMenuId,
-            onclick: this.getClickHandler(tabTest)
+            onclick: this.getClickHandler(tabTest).bind(this)
         });
     },
 
@@ -110,34 +111,38 @@ ContextMenu.prototype = {
     },
 
     initContextMenu: function(tab) {
-        if (!this.contextMenuId) return;
+        if (this.contextMenuId) return;
 
-        this.contextMenuId = this.chrome.contextMenus.create({ title: 'Close tabs', contexts: contexts });
+        this.contextMenuId = this.chrome.contextMenus.create({
+            title: 'Close tabs',
+            contexts: this.contexts
+        });
 
-        this.addItem("Other tabs", b.tabTests.otherTabs);
-        this.addItem("Tabs to the left", b.tabTests.tabsToTheLeft);
-        this.addItem("Tabs to the right", b.tabTests.tabsToTheRight);
+        this.addItem('Other tabs', this.tabTests.otherTabs);
+        this.addItem('Tabs to the left', this.tabTests.tabsToTheLeft);
+        this.addItem('Tabs to the right', this.tabTests.tabsToTheRight);
         this.addSeparator();
 
-        this.addItem("Tabs from this domain" + domain, b.tabTests.tabsFromDomain);
-        this.addItem("Other tabs from this domain" + domain, b.tabTests.otherTabsFromDomain);
-        this.addItem("Tabs from other domain" + domain, b.tabTests.tabsFromOtherDomain);
+        this.addItem('Tabs from domain', this.tabTests.tabsFromDomain);
+        this.addItem('Other tabs from domain', this.tabTests.otherTabsFromDomain);
+        this.addItem('Tabs from other domain', this.tabTests.tabsFromOtherDomain);
         this.addSeparator();
 
-        this.addItem("Options", this.openOptions);
+        this.addItem('Options', this.openOptions);
     },
 
     openOptions: function(info, tab) {
-        this.chrome.tabs.create({ url: "options.htm" });
+        this.chrome.tabs.create({ url: 'options.htm' });
     }
 };
 
 // don't instantiate anything during test runs
-if (typeof chrome !== undefined) {
-   var contextMenu = new ContextMenu();
-   contextMenu.init();
+if (typeof chrome !== 'undefined') {
+    var contextMenu = new ContextMenu();
+    contextMenu.init();
 }
 
-if (typeof module !== undefined) {
-    module.exports = { ContextMenu: ContextMenu };
+// only export when run from node
+if (typeof module !== 'undefined') {
+   module.exports = { ContextMenu: ContextMenu };
 }

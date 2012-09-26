@@ -79,4 +79,16 @@ describe('ContextMenu', function() {
             assert.deepEqual([1], closed);
         });
     });
+
+    it('handles clicks', function(done) {
+        var tabTest = sinon.stub().returns(false);
+        var handler = contextMenu.getClickHandler(tabTest);
+        sinon.stub(contextMenu, 'getWindowTabs').yields(tabs);
+
+        handler(null, tabs[1].tab, function() {
+            assert.equal(4, tabTest.callCount);
+            assert.equal(true, chrome.tabs.remove.calledWith([]));
+            done();
+        });
+    });
 });
