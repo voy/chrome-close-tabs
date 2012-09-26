@@ -62,10 +62,6 @@
         }
     },
 
-    // A generic onclick callback function.
-    userOnClick: function (info, tab) {
-        chrome.tabs.create({ url: b.url });
-    },
 
     closeTabsToTheLeft: function (info, tab) {
         b.temp.currentTab = tab;
@@ -168,7 +164,7 @@
 
         if (tab !== undefined) domain = b.getDomain(tab.url);
 
-        b.contextMenuId = chrome.contextMenus.create({ "title": 'Close tabs', "contexts": contexts });
+        b.contextMenuId = chrome.contextMenus.create({ title: 'Close tabs', contexts: contexts });
 
         function addItem(title, handler) {
             chrome.contextMenus.create({

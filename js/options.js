@@ -23,6 +23,7 @@
         if (o.currentIconPath === undefined) o.currentIconPath = o.defaultIconPath;
         return o.currentIconPath;
     },
+
     setIcon: function (iconPath) {
         localStorage[o.keyCurrentIconPath] = iconPath;
         o.currentIconPath = iconPath;
@@ -99,6 +100,3 @@
         });
     }
 };
-
-
-//o.init();
