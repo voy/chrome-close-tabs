@@ -27,7 +27,8 @@ ContextMenu.prototype = {
     },
 
     getWindowTabs: function(callback) {
-        this.chrome.tabs.query({ windowId: this.chrome.windows.WINDOW_ID_CURRENT }, function(tabs) {
+        var params = { windowId: this.chrome.windows.WINDOW_ID_CURRENT };
+        this.chrome.tabs.query(params, function(tabs) {
             var result = tabs.map(this.enrichTab, this);
             callback(result);
         }.bind(this));
@@ -59,6 +60,10 @@ ContextMenu.prototype = {
         }
     },
 
+    /**
+     * Determines what tabs should be closed using supplied test function and
+     * returns their ids.
+     */
     getTabsToClose: function(currentTab, allTabs, tabTest) {
         var tabsToClose = allTabs.filter(function(testedTab) {
             return tabTest(currentTab, testedTab);
@@ -79,15 +84,17 @@ ContextMenu.prototype = {
      * which the test function returns true.
      */
     getClickHandler: function(tabTest, callback) {
-        var clickHandler = function(info, tab, callback) {
-            this.getWindowTabs(function(allTabs) {
+        var clickHandler = function(info, tab) {
+            var execute = function(allTabs) {
                 var currentTab = this.enrichTab(tab);
 
                 var tabsToClose = this.getTabsToClose(currentTab, allTabs, tabTest);
                 this._closeTabs(tabsToClose);
 
                 callback && callback();
-            }.bind(this));
+            }.bind(this);
+
+            this.getWindowTabs(execute);
         }.bind(this);
 
         return clickHandler;
