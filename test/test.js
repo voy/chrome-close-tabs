@@ -1,6 +1,6 @@
 var assert = require('assert');
 var sinon = require('sinon');
-var ContextMenu = require('../js/background.js').ContextMenu;
+var ContextMenu = require('../js/context_menu.js');
 
 function createTabs() {
     var tabs = [];

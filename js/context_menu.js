@@ -144,5 +144,5 @@ if (typeof chrome !== 'undefined') {
 
 // only export when run from node
 if (typeof module !== 'undefined') {
-   module.exports = { ContextMenu: ContextMenu };
+   module.exports = ContextMenu;
 }
