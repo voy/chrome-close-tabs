@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "version": "1.0",
-    "name": "Close Tabs",
+    "name": "Close Tabs (Enhanced Edition)",
     "description": "Context menu to close - tabs to the left, tabs to the right, other tabs, tabs from same domain, current tab, window and more",
     "homepage_url": "http://tejji.com/",
     "background": {

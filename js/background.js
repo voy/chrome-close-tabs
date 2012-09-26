@@ -1,190 +1,143 @@
-﻿var b = {
-    keyVersion: "version",
-    url: "chrome://extensions/",
-    contextMenuId: undefined,
-    homePageUrl: "http://tejji.com/",
-    temp: {},
+function ContextMenu(chromeObj) {
+    if (chromeObj) {
+        this.chrome = chromeObj;
+    } else if (typeof chrome !== 'undefined') {
+        this.chrome = chrome;
+    }
 
-    init: function () {
-        o.initContextMenu();
-        b.initInstall();
+    this.contexts = ['all'];
+    this.contextMenuId = null;
+}
+
+ContextMenu.prototype = {
+
+    init: function() {
+        this.initContextMenu();
     },
 
-    navigate: function (url) {
-        chrome.tabs.getSelected(null, function (tab) {
-            chrome.tabs.update(tab.id, { url: url });
-        });
-    },
-
-    initInstall: function () {
-        function onInstall() {
-            openHomePage();
-        }
-
-        function onUpdate() {
-            openHomePage();
-        }
-
-        function openHomePage() {
-            chrome.tabs.getAllInWindow(undefined, function (tabs) {
-                var isHomeTab = false;
-                for (var i = 0, tab; tab = tabs[i]; i++) {
-                    if (tab.url === b.homePageUrl) {
-                        isHomeTab = true;
-                        break;
-                    }
-                }
-                if (!isHomeTab) chrome.tabs.create({ url: b.homePageUrl });
-                chrome.tabs.create({ url: "options.htm" });
-            });
-        }
-
-        function getVersion() {
-            var version = 'NaN';
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', chrome.extension.getURL('manifest.json'), false);
-            xhr.send(null);
-            var manifest = $.parseJSON(xhr.responseText);
-            return manifest.version;
-        }
-
-        // Check if the version has changed.
-        var currVersion = getVersion();
-        var prevVersion = localStorage[b.keyVersion];
-        if (currVersion != prevVersion) {
-            // Check if we just installed this extension.
-            if (typeof prevVersion == 'undefined') {
-                onInstall();
-            } else {
-                onUpdate();
-            }
-            localStorage[b.keyVersion] = currVersion;
-        }
-    },
-
-
-    closeTabsToTheLeft: function (info, tab) {
-        b.temp.currentTab = tab;
-        chrome.tabs.getAllInWindow(null, function (tabs) {
-            for (var i = 0; i < tabs.length; i++) {
-                if (tabs[i].index < b.temp.currentTab.index) {
-                    chrome.tabs.remove(tabs[i].id, null);
-                } else {
-                    break;
-                }
-            }
-        });
-    },
-
-    closeTabsToTheRight: function (info, tab) {
-        b.temp.currentTab = tab;
-        chrome.tabs.getAllInWindow(null, function (tabs) {
-            for (var i = tabs.length - 1; i > 0; i--) {
-                if (tabs[i].index > b.temp.currentTab.index) {
-                    chrome.tabs.remove(tabs[i].id, null);
-                } else {
-                    break;
-                }
-            }
-        });
-    },
-
-    closeOtherTabs: function (info, tab) {
-        b.temp.currentTab = tab;
-        chrome.tabs.getAllInWindow(null, function (tabs) {
-            for (var i = 0; i < tabs.length; i++) {
-                if (tabs[i].index != b.temp.currentTab.index) {
-                    chrome.tabs.remove(tabs[i].id, null);
-                }
-            }
-        });
-    },
-
-    closeCurrentTab: function (info, tab) {
-        chrome.tabs.remove(tab.id, null);
-    },
-
-    getDomain: function (url) {
+    getDomain: function(url) {
         return url.split(/\/+/g)[1];
     },
 
-    closeOtherTabsFromDomain: function (info, tab) {
-        b.temp.currentTab = tab;
-        b.temp.currentDomain = b.getDomain(tab.url);
-        chrome.tabs.getAllInWindow(null, function (tabs) {
-            for (var i = 0; i < tabs.length; i++) {
-                var domain = b.getDomain(tabs[i].url);
-                if (b.temp.currentDomain === domain && tabs[i].index != b.temp.currentTab.index) {
-                    chrome.tabs.remove(tabs[i].id, null);
-                }
-            }
+    enrichTab: function(tab) {
+        return {
+            tab: tab,
+            domain: this.getDomain(tab.url)
+        };
+    },
+
+    getWindowTabs: function(callback) {
+        this.chrome.tabs.query({ windowId: this.chrome.windows.WINDOW_ID_CURRENT }, function(tabs) {
+            var result = tabs.map(this.enrichTab);
+            callback(result);
         });
     },
 
-    closeTabsFromDomain: function (info, tab) {
-        b.temp.currentTab = tab;
-        b.temp.currentDomain = b.getDomain(tab.url);
-        chrome.tabs.getAllInWindow(null, function (tabs) {
-            for (var i = 0; i < tabs.length; i++) {
-                var domain = b.getDomain(tabs[i].url);
-                if (b.temp.currentDomain === domain) {
-                    chrome.tabs.remove(tabs[i].id, null);
-                }
-            }
+    tabTests: {
+        tabsToTheLeft: function(currentTab, testedTab) {
+            return testedTab.tab.index < currentTab.tab.index;
+        },
+
+        tabsToTheRight: function(currentTab, testedTab) {
+            return testedTab.tab.index > currentTab.tab.index;
+        },
+
+        otherTabs: function(currentTab, testedTab) {
+            return testedTab.tab.index !== currentTab.tab.index;
+        },
+
+        tabsFromDomain: function(currentTab, testedTab) {
+            return currentTab.domain === testedTab.domain;
+        },
+
+        tabsFromOtherDomain: function(currentTab, testedTab) {
+            return testedTab.domain !== currentTab.domain;
+        },
+
+        otherTabsFromDomain: function(currentTab, testedTab) {
+            return testedTab.domain === currentTab.domain && testedTab.tab.index !== currentTab.tab.index;
+        }
+    },
+
+    getTabsToClose: function(currentTab, allTabs, tabTest) {
+        var tabsToClose = allTabs.filter(function(testedTab) {
+            return tabTest(currentTab, testedTab);
         });
+
+        tabsToClose = tabsToClose.map(function(tab) { return tab.tab.id; });
+
+        return tabsToClose;
     },
 
-    closeTabsFromOtherDomain: function (info, tab) {
-        b.temp.currentTab = tab;
-        b.temp.currentDomain = b.getDomain(tab.url);
-        chrome.tabs.getAllInWindow(null, function (tabs) {
-            for (var i = 0; i < tabs.length; i++) {
-                var domain = b.getDomain(tabs[i].url);
-                if (b.temp.currentDomain !== domain) {
-                    chrome.tabs.remove(tabs[i].id, null);
-                }
-            }
-        });
+    _closeTabs: function(tabIds) {
+        this.chrome.tabs.remove(tabIds);
     },
 
-    closeWindow: function (info, tab) {
-        chrome.windows.getCurrent(function (window) {
-            chrome.windows.remove(window.id, null);
-        });
-    },
+    /**
+     * Given a tab test function returns a context menu click handler item which runs
+     * that test against all tabs in the current window and closes those tabs for
+     * which the test function returns true.
+     */
+    getClickHandler: function(tabTest) {
+        var contextMenu = this;
 
-    openOptions: function (info, tab) {
-        chrome.tabs.create({ url: "options.htm" });
-    },
-
-    initContextMenu: function (tab) {
-        if (b.contextMenuId !== undefined) return;
-        var contexts = ["all"];
-        var domain = ""
-
-        if (tab !== undefined) domain = b.getDomain(tab.url);
-
-        b.contextMenuId = chrome.contextMenus.create({ title: 'Close tabs', contexts: contexts });
-
-        function addItem(title, handler) {
-            chrome.contextMenus.create({
-                title: title,
-                contexts: contexts,
-                parentId: b.contextMenuId,
-                onclick: handler
+        function clickHandler(info, tab) {
+            currentTab = b.enrichTab(tab)
+            this.getWindowTabs(function(allTabs) {
+                var tabsToClose = contextMenu.closeTabs(currentTab, allTabs, tabTest);
+                contextMenu._closeTabs(tabsToClose);
             });
         }
 
-        addItem("Close tabs to the left", b.closeTabsToTheLeft);
-        addItem("Close tabs to the right", b.closeTabsToTheRight);
-        addItem("Close other tabs", b.closeOtherTabs);
-        addItem("Close current tab", b.closeCurrentTab);
-        addItem("Close other tabs from this domain" + domain, b.closeOtherTabsFromDomain);
-        addItem("Close tabs from this domain" + domain, b.closeTabsFromDomain);
-        addItem("Close tabs from other domain" + domain, b.closeTabsFromOtherDomain);
-        addItem("Close window", b.closeWindow);
-        addItem("Options", b.openOptions);
+        return clickHandler;
+    },
+
+    addItem: function(title, tabTest) {
+        this.chrome.contextMenus.create({
+            title: title,
+            contexts: this.contexts,
+            parentId: this.contextMenuId,
+            onclick: this.getClickHandler(tabTest)
+        });
+    },
+
+    addSeparator: function() {
+        this.chrome.contextMenus.create({
+            type: 'separator',
+            parentId: this.contextMenuId,
+            contexts: this.contexts
+        });
+    },
+
+    initContextMenu: function(tab) {
+        if (!this.contextMenuId) return;
+
+        this.contextMenuId = this.chrome.contextMenus.create({ title: 'Close tabs', contexts: contexts });
+
+        this.addItem("Other tabs", b.tabTests.otherTabs);
+        this.addItem("Tabs to the left", b.tabTests.tabsToTheLeft);
+        this.addItem("Tabs to the right", b.tabTests.tabsToTheRight);
+        this.addSeparator();
+
+        this.addItem("Tabs from this domain" + domain, b.tabTests.tabsFromDomain);
+        this.addItem("Other tabs from this domain" + domain, b.tabTests.otherTabsFromDomain);
+        this.addItem("Tabs from other domain" + domain, b.tabTests.tabsFromOtherDomain);
+        this.addSeparator();
+
+        this.addItem("Options", this.openOptions);
+    },
+
+    openOptions: function(info, tab) {
+        this.chrome.tabs.create({ url: "options.htm" });
     }
 };
 
-b.init();
+// don't instantiate anything during test runs
+if (typeof chrome !== undefined) {
+   var contextMenu = new ContextMenu();
+   contextMenu.init();
+}
+
+if (typeof module !== undefined) {
+    module.exports = { ContextMenu: ContextMenu };
+}
