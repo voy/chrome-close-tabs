@@ -116,6 +116,19 @@
         return url.split(/\/+/g)[1];
     },
 
+    closeOtherTabsFromDomain: function (info, tab) {
+        b.temp.currentTab = tab;
+        b.temp.currentDomain = b.getDomain(tab.url);
+        chrome.tabs.getAllInWindow(null, function (tabs) {
+            for (var i = 0; i < tabs.length; i++) {
+                var domain = b.getDomain(tabs[i].url);
+                if (b.temp.currentDomain === domain && tabs[i].index != b.temp.currentTab.index) {
+                    chrome.tabs.remove(tabs[i].id, null);
+                }
+            }
+        });
+    },
+
     closeTabsFromDomain: function (info, tab) {
         b.temp.currentTab = tab;
         b.temp.currentDomain = b.getDomain(tab.url);
@@ -158,41 +171,27 @@
         var domain = ""
 
         if (tab !== undefined) domain = b.getDomain(tab.url);
-        b.contextMenuId = chrome.contextMenus.create({ "title": title, "contexts": contexts
-            //,"onclick": b.userOnClick
-        });
-        chrome.contextMenus.create({ "title": "Close tabs to the left", "contexts": contexts
-            , "parentId": b.contextMenuId
-            , "onclick": b.closeTabsToTheLeft
-        });
-        chrome.contextMenus.create({ "title": "Close tabs to the right", "contexts": contexts
-            , "parentId": b.contextMenuId
-            , "onclick": b.closeTabsToTheRight
-        });
-        chrome.contextMenus.create({ "title": "Close other tabs", "contexts": contexts
-            , "parentId": b.contextMenuId
-            , "onclick": b.closeOtherTabs
-        });
-        chrome.contextMenus.create({ "title": "Close current tab", "contexts": contexts
-            , "parentId": b.contextMenuId
-            , "onclick": b.closeCurrentTab
-        });
-        chrome.contextMenus.create({ "title": "Close tabs from this domain" + domain, "contexts": contexts
-            , "parentId": b.contextMenuId
-            , "onclick": b.closeTabsFromDomain
-        });
-        chrome.contextMenus.create({ "title": "Close tabs from other domain" + domain, "contexts": contexts
-            , "parentId": b.contextMenuId
-            , "onclick": b.closeTabsFromOtherDomain
-        });
-        chrome.contextMenus.create({ "title": "Close window", "contexts": contexts
-            , "parentId": b.contextMenuId
-            , "onclick": b.closeWindow
-        });
-        chrome.contextMenus.create({ "title": "Options", "contexts": contexts
-            , "parentId": b.contextMenuId
-            , "onclick": b.openOptions
-        });
+
+        b.contextMenuId = chrome.contextMenus.create({ "title": 'Close tabs', "contexts": contexts });
+
+        function addItem(title, handler) {
+            chrome.contextMenus.create({
+                title: title,
+                contexts: contexts,
+                parentId: b.contextMenuId,
+                onclick: handler
+            });
+        }
+
+        addItem("Close tabs to the left", b.closeTabsToTheLeft);
+        addItem("Close tabs to the right", b.closeTabsToTheRight);
+        addItem("Close other tabs", b.closeOtherTabs);
+        addItem("Close current tab", b.closeCurrentTab);
+        addItem("Close other tabs from this domain" + domain, b.closeOtherTabsFromDomain);
+        addItem("Close tabs from this domain" + domain, b.closeTabsFromDomain);
+        addItem("Close tabs from other domain" + domain, b.closeTabsFromOtherDomain);
+        addItem("Close window", b.closeWindow);
+        addItem("Options", b.openOptions);
     },
 
     initOmniBox: function () {
