@@ -17,3 +17,5 @@ You will need mocha and sinon to run tests:
 The icon used is from the Oxygen Icon set by the Oxygen Team.
 
 Vojtech Jasny <voy@voy.cz>
+
+[![Build Status](https://secure.travis-ci.org/voy/chrome-close-tabs.png?branch=master)](https://secure.travis-ci.org/voy/chrome-close-tabs)
