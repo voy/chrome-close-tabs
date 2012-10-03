@@ -130,16 +130,9 @@ ContextMenu.prototype = {
         this.addItem('To the →', this.tabTests.tabsToTheRight);
         this.addSeparator();
 
-        this.addItem('From domain', this.tabTests.tabsFromDomain);
-        this.addItem('Other from domain', this.tabTests.otherTabsFromDomain);
-        this.addItem('From other domain', this.tabTests.tabsFromOtherDomain);
-        this.addSeparator();
-
-        this.addItem('About', this.openAbout);
-    },
-
-    openAbout: function(info, tab) {
-        this.chrome.tabs.create({ url: 'about.html' });
+        this.addItem('From site', this.tabTests.tabsFromDomain);
+        this.addItem('All other from site', this.tabTests.otherTabsFromDomain);
+        this.addItem('All from other site', this.tabTests.tabsFromOtherDomain);
     }
 };
 
