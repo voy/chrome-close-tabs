@@ -3,9 +3,9 @@
     "version": "2.0",
     "name": "Close Tabs (Enhanced Edition)",
     "description": "Context menu to close tabs in various clever ways.",
-	"homepage_url": "https://github.com/voy/chrome-close-tabs/",
+    "homepage_url": "https://github.com/voy/chrome-close-tabs/",
     "background": {
-		"scripts": ["js/context_menu.js"]
+        "scripts": ["js/context_menu.js"]
     },
     "icons": {
         "128": "img/close-tabs-128.png",
