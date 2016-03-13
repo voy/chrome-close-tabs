@@ -5,7 +5,7 @@
     "description": "Context menu to close tabs in various clever ways.",
     "homepage_url": "https://github.com/voy/chrome-close-tabs/",
     "background": {
-        "scripts": ["js/context_menu.js"]
+        "scripts": ["js/utils.js", "js/context_menu.js", "js/main.js"]
     },
     "icons": {
         "128": "img/close-tabs-128.png",
