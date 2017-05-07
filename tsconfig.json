@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "esnext",
+        "baseUrl": "./src",
+        "noImplicitAny": false,
+        "sourceMap": false,
+        "strictNullChecks": true
+    },
+    "exclude": ["node_modules"]
+}

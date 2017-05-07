@@ -1,18 +1,18 @@
 {
     "manifest_version": 2,
-    "version": "2.0",
-    "name": "Close Tabs (Enhanced Edition)",
+    "version": "2.1",
+    "name": "TabEraser",
     "description": "Context menu to close tabs in various clever ways.",
     "homepage_url": "https://github.com/voy/chrome-close-tabs/",
     "background": {
-        "scripts": ["js/utils.js", "js/context_menu.js", "js/main.js"]
+        "scripts": ["bundle.js"]
     },
     "icons": {
-        "128": "img/close-tabs-128.png",
-        "48":  "img/close-tabs-48.png",
-        "32":  "img/close-tabs-32.png",
-        "24":  "img/close-tabs-24.png",
-        "16":  "img/close-tabs-16.png"
+        "128": "images/close-tabs-128.png",
+        "48":  "images/close-tabs-48.png",
+        "32":  "images/close-tabs-32.png",
+        "24":  "images/close-tabs-24.png",
+        "16":  "images/close-tabs-16.png"
     },
     "permissions": ["*://*/*", "contextMenus", "tabs"]
 }
