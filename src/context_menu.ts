@@ -8,17 +8,20 @@ type partialPredicate = (tab: DecoratedTab) => boolean;
 
 const MENU_ITEMS: MenuItem[] = [
     {
-        title: 'From domain',
-        predicate: TabPredicates.tabsFromDomain
-    }, {
-        title: 'All other from domain',
-        predicate: TabPredicates.otherTabsFromDomain
-    }, {
-        title: 'From SLD',
+        title: 'example.com',
         predicate: TabPredicates.tabsFromSld
-    }, {
-        title: 'All other from SLD',
+    },
+    {
+        title: 'example.com (keep this tab)',
         predicate: TabPredicates.otherTabsFromSld
+    },
+    {
+        title: '*.example.com',
+        predicate: TabPredicates.tabsFromDomain
+    },
+    {
+        title: '*.example.com (keep this tab)',
+        predicate: TabPredicates.otherTabsFromDomain
     }
 ];
 
@@ -32,7 +35,7 @@ export default class ContextMenu {
     initialize() {
         this.chrome.contextMenus.create({
             id: 'root',
-            title: 'Close tabs',
+            title: 'TabEraser',
             contexts: ContextMenu.CONTEXTS
         });
 
@@ -58,7 +61,9 @@ export default class ContextMenu {
         const matchingTabs = tabs.filter(tab => predicate(tab));
         const tabIds = matchingTabs.map(get('tab.id')).filter(isNumber) as number[];
 
-        this.chrome.tabs.remove(tabIds);
+        if (tabIds.length) {
+            this.chrome.tabs.remove(tabIds);
+        }
     }
 
     private createMenuItem(menuItem: MenuItem) {

@@ -5,8 +5,8 @@
     "test": "mocha -r ts-node/register test/**/*.ts",
     "clean": "rm -rf build/* && mkdir -p build/extension",
     "copy-assets": "cp -r images build/extension && cp manifest.json build",
-    "create-zip": "cp key.pem build/extension && cp -r images build/extension && cp manifest.json build/extension && cd build/extension && zip -r ../tab-eraser.zip *",
-    "build": "npm run clean && npm run copy-assets && webpack --config=webpack.config.js && npm run create-zip",
+    "create-zip": "cp key.pem build/extension && cp -r images build/extension && cp manifest.json build/extension && cd build/extension && zip -r ../tab-eraser.zip * && rm key.pem",
+    "build": "npm run test && npm run clean && npm run copy-assets && webpack --config=webpack.config.js && npm run create-zip",
     "watch": "npm run clean && npm run copy-assets && webpack --watch --config=webpack.config.js"
   },
   "devDependencies": {
