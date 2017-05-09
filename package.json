@@ -4,9 +4,10 @@
   "scripts": {
     "test": "mocha -r ts-node/register test/**/*.ts",
     "clean": "rm -rf build/* && mkdir -p build/extension",
-    "copy-assets": "cp -r images build/extension && cp manifest.json build",
-    "create-zip": "cp key.pem build/extension && cp -r images build/extension && cp manifest.json build/extension && cd build/extension && zip -r ../tab-eraser.zip * && rm key.pem",
-    "build": "npm run test && npm run clean && npm run copy-assets && webpack --config=webpack.config.js && npm run create-zip",
+    "copy-assets": "cp -r images build/extension && cp manifest.json build/extension",
+    "create-zip": "cp key.pem build/extension && cd build/extension && zip -r ../tab-eraser.zip * && rm key.pem",
+    "build": "npm run test && npm run clean && npm run copy-assets && webpack --config=webpack.config.js && npm run copy-assets",
+    "dist": "npm run build && npm run create-zip",
     "watch": "npm run clean && npm run copy-assets && webpack --watch --config=webpack.config.js"
   },
   "devDependencies": {
@@ -23,12 +24,10 @@
     "babel-loader": "^7.0.0",
     "chai": "^3.5.0",
     "chai-sinon": "^2.8.1",
-    "crx-webpack-plugin": "^0.1.5",
     "lodash": "^4.17.4",
     "mocha": "^3.3.0",
     "sinon": "^2.1.0",
     "sinon-chai": "^2.10.0",
-    "source-map-loader": "^0.2.1",
     "ts-loader": "^2.0.3",
     "ts-node": "^3.0.2",
     "webpack": "^2.4.1"

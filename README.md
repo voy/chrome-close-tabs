@@ -1,18 +1,11 @@
-# Close Tabs (Enhanced Edition)
+# TabEraser
 
-A Chrome plugin adding enhanced tab closing capabilities
+A Chrome plugin, which adds enhanced tab closing capabilities.
 
-Close Tabs was originally created by guys from Tejji.com. I found in on the 
-Chrome store and was missing a feature, namely to close all tabs from
-the currect tab's domain except for the current tab. The authors weren't
-responding and there is no repo on GitHub for the plugin, so I wasn't able
-to contribute my patches back. I rewrote the plugin and added my new 
-functionality, but of course the credit to its original authors.
+Originally created by guys from Tejji.com. I found their work and missing a feature
+I ended up rewriting it completely, eventually in TypeScript.
 
-You will need mocha and sinon to run tests:
-
-    $ npm install -g mocha
-    $ npm install -g sinon
+To build and test `npm run test` and `npm run build` are your friends.
 
 The icon used is from the Oxygen Icon set by the Oxygen Team.
 

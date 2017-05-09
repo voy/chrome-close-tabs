@@ -1,16 +1,16 @@
+const path = require('path');
+
+const ENTRY_POINT = path.join(path.resolve('./src'), 'index.ts');
+const BUILD_PATH = path.join(path.resolve('.', 'build', 'extension'));
+
 module.exports = {
-  entry: './src/index.ts',
+  entry: ENTRY_POINT,
   output: {
     filename: 'bundle.js',
-    path: require('path').resolve('build/extension')
+    path: BUILD_PATH
   },
   module: {
     rules: [
-      {
-        enforce: 'pre',
-        test: /\.js$/,
-        loader: 'source-map-loader'
-      },
       {
         test: /\.ts?$/,
         loader: 'babel-loader!ts-loader',
@@ -22,18 +22,4 @@ module.exports = {
     extensions: ['.js', '.ts']
   },
   devtool: 'inline-source-map'
-}
-
-if (process.env.npm_lifecycle_event === 'build') {
-  const path = require('path');
-  const Crx = require("crx-webpack-plugin");
-
-  module.exports.plugins = [
-    new Crx({
-      keyFile: path.resolve('./key.pem'),
-      contentPath: path.resolve('./build/extension'),
-      outputPath: path.resolve('./build'),
-      name: 'tab-eraser'
-    })
-  ];
 }
