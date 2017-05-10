@@ -1,6 +1,6 @@
 {
   "name": "chrome-close-tabs",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "scripts": {
     "test": "mocha -r ts-node/register test/**/*.ts",
     "clean": "rm -rf build/* && mkdir -p build/extension",
