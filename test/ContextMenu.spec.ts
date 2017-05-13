@@ -3,7 +3,8 @@ import { head, flow, equals, get } from 'lodash/fp';
 import * as sinon from 'sinon';
 import { expect } from 'chai';
 
-import ContextMenu from '../src/context_menu';
+import ContextMenu from '../src/ContextMenu';
+import {decorateTab} from '../src/utils';
 
 function mockTabs() {
     let tabs: any[] = [];
@@ -36,18 +37,18 @@ function mockChromeApi(tabs) {
     };
 }
 
-function mockMenuItems() {
+function mockMenuItems(): MenuItem[] {
     return [
         {
             title: 'close all',
-            predicate: () => true
+            matcher: sinon.spy((tabs) => tabs)
         }, {
             title: 'close none',
-            predicate: () => false
+            matcher: () => []
         }, {
             title: 'close second',
-            predicate: (activeTab, testedTab) => {
-                return testedTab.tab.index === 1;
+            matcher: (tabs) => {
+                return tabs.filter(testedTab => testedTab.tab.index === 1);
             }
         }
     ]
@@ -56,6 +57,14 @@ function mockMenuItems() {
 
 describe('ContextMenu', function() {
     let contextMenu, tabs, chrome, menuItems;
+
+    const currentTab = { url: 'http://something.com/' };
+
+    function getContextMenuItem(title: string) {
+        return chrome.contextMenus.create.args
+            .map(head)
+            .find(item => item.title === title);
+    }
 
     beforeEach(function() {
         tabs = mockTabs();
@@ -71,14 +80,6 @@ describe('ContextMenu', function() {
     });
 
     describe('tab closing', () => {
-        const currentTab = { url: 'http://something.com/' };
-
-        function getContextMenuItem(title: string) {
-            return chrome.contextMenus.create.args
-                .map(head)
-                .find(item => item.title === title);
-        }
-
         it('should close all tabs', async function() {
             const menuItem = getContextMenuItem('close all');
             await menuItem.onclick(null, currentTab);
@@ -88,17 +89,29 @@ describe('ContextMenu', function() {
         it('should close no tabs', async function() {
             const menuItem = getContextMenuItem('close none');
             await menuItem.onclick(null, currentTab);
-            menuItem.onclick();
             expect(chrome.tabs.remove.notCalled).to.equal(true);
         });
 
         it('should close second tab', async function() {
             const menuItem = getContextMenuItem('close second');
             await menuItem.onclick(null, currentTab);
-            menuItem.onclick();
             expect(chrome.tabs.remove.args[0][0]).to.eql([1]);
         });
+    });
 
-        it('should pass correct params to the predicate');
+    describe('matcher call', () => {
+        it('should be called with decorated tabs from the current window', async function() {
+            const menuItem = getContextMenuItem('close all');
+            await menuItem.onclick(null, currentTab);
+            const calledTabs = menuItems[0].matcher.args[0][0];
+            expect(calledTabs).to.eql(tabs.map(decorateTab));
+        });
+
+        it('should be called with decorated current tab', async function() {
+            const menuItem = getContextMenuItem('close all');
+            await menuItem.onclick(null, currentTab);
+            const calledCurrentTab = menuItems[0].matcher.args[0][1];
+            expect(calledCurrentTab).to.eql(decorateTab(currentTab as Tab));
+        });
     });
 });

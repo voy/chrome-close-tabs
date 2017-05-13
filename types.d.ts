@@ -6,10 +6,10 @@ interface DecoratedTab {
 
 interface MenuItem {
     title: string;
-    predicate: TabPredicate;
+    matcher: TabMatcher;
 }
 
-type TabPredicate = (tabA: DecoratedTab, tabB: DecoratedTab) => boolean;
+type TabMatcher = (tabs: DecoratedTab[], tabB: DecoratedTab) => DecoratedTab[];
 
 type Chrome = typeof chrome;
 type Tab = chrome.tabs.Tab;

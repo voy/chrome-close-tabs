@@ -1,4 +1,4 @@
-import ContextMenu from './context_menu';
+import ContextMenu from './ContextMenu';
 
 let contextMenu = new ContextMenu(chrome);
 contextMenu.initialize();
