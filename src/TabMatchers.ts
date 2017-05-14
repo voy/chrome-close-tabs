@@ -25,3 +25,24 @@ export const otherTabsFromSld: TabMatcher = (tabs, activeTab) => {
         return activeTab.sld === testedTab.sld && !tabsEqual(testedTab, activeTab);
     })
 };
+
+export const duplicates: TabMatcher = (tabs) => {
+    let urls = new Set<string>();
+    let duplicates: DecoratedTab[] = [];
+
+    for (let decoratedTab of tabs) {
+        const { url } = decoratedTab.tab;
+
+        if (typeof url !== 'string') {
+            continue;
+        }
+
+        if (urls.has(url)) {
+            duplicates.push(decoratedTab);
+        }
+
+        urls.add(url);
+    }
+
+    return duplicates;
+}
