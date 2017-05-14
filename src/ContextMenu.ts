@@ -11,14 +11,28 @@ const MENU_ITEMS: MenuItem[] = [
         matcher: TabMatchers.otherTabsFromDomain
     },
     {
+        type: 'separator'
+    },
+    {
         title: '*.example.com',
         matcher: TabMatchers.tabsFromSld
     },
     {
         title: '*.example.com (keep this tab)',
         matcher: TabMatchers.otherTabsFromSld
+    },
+    {
+        type: 'separator'
+    },
+    {
+        title: 'duplicates (keep first tab)',
+        matcher: TabMatchers.duplicates
     }
 ];
+
+function isSeparator(menuItem: MenuItem): menuItem is SeparatorItem {
+    return (menuItem as SeparatorItem).type === 'separator';
+}
 
 export default class ContextMenu {
 
@@ -59,6 +73,16 @@ export default class ContextMenu {
     }
 
     private createMenuItem(menuItem: MenuItem) {
+        if (isSeparator(menuItem)) {
+            this.chrome.contextMenus.create({
+                type: 'separator',
+                parentId: 'root',
+                contexts: ContextMenu.CONTEXTS,
+            });
+
+            return;
+        }
+
         const { title, matcher } = menuItem;
 
         this.chrome.contextMenus.create({

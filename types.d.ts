@@ -4,7 +4,13 @@ interface DecoratedTab {
     domain: string;
 }
 
-interface MenuItem {
+type MenuItem = SeparatorItem | TabMatcherItem;
+
+interface SeparatorItem {
+    type: 'separator'
+}
+
+interface TabMatcherItem {
     title: string;
     matcher: TabMatcher;
 }

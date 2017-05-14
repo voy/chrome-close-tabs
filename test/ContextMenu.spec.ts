@@ -79,6 +79,14 @@ describe('ContextMenu', function() {
        expect(chrome.contextMenus.create.callCount).to.equal(4);
     });
 
+    it('creates separator items', () => {
+        chrome.contextMenus.create.reset();
+        contextMenu = new ContextMenu(chrome, [{ type: 'separator' }]);
+        contextMenu.initialize();
+        expect(chrome.contextMenus.create.args[1][0].type).to.eql('separator');
+        expect(chrome.contextMenus.create.callCount).to.equal(2);
+    });
+
     describe('tab closing', () => {
         it('should close all tabs', async function() {
             const menuItem = getContextMenuItem('close all');
