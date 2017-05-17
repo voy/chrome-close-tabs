@@ -42,13 +42,15 @@ export default class ContextMenu {
                 private menuItems: MenuItem[] = MENU_ITEMS) {}
 
     initialize() {
-        this.chrome.contextMenus.create({
-            id: 'root',
-            title: 'TabEraser',
-            contexts: ContextMenu.CONTEXTS
-        });
+        this.chrome.contextMenus.removeAll(() => {
+            this.chrome.contextMenus.create({
+                id: 'root',
+                title: 'TabEraser',
+                contexts: ContextMenu.CONTEXTS
+            });
 
-        this.menuItems.forEach(menuItem => this.createMenuItem(menuItem));
+            this.menuItems.forEach(menuItem => this.createMenuItem(menuItem));
+        });
     }
 
     /**
@@ -86,7 +88,7 @@ export default class ContextMenu {
         const { title, matcher } = menuItem;
 
         this.chrome.contextMenus.create({
-            title,
+            title: title + Date.now(),
             contexts: ContextMenu.CONTEXTS,
             parentId: 'root',
             onclick: this.getClickHandler(matcher)

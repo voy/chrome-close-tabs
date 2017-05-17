@@ -14,5 +14,11 @@
         "24":  "images/close-tabs-24.png",
         "16":  "images/close-tabs-16.png"
     },
-    "permissions": ["*://*/*", "contextMenus", "tabs"]
+    "permissions": ["*://*/*", "contextMenus", "tabs"],
+    "content_scripts": [
+        {
+            "matches": ["*://*/*"],
+            "js": ["content_script.js"]
+        }
+    ]
 }

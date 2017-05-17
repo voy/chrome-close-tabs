@@ -32,6 +32,7 @@ function mockChromeApi(tabs) {
             query: sinon.stub().yieldsAsync(tabs)
         },
         contextMenus: {
+            removeAll: (callback) => callback(),
             create: sinon.stub()
         }
     };
@@ -63,7 +64,7 @@ describe('ContextMenu', function() {
     function getContextMenuItem(title: string) {
         return chrome.contextMenus.create.args
             .map(head)
-            .find(item => item.title === title);
+            .find(item => item.title.startsWith(title));
     }
 
     beforeEach(function() {

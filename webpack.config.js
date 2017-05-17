@@ -1,12 +1,17 @@
 const path = require('path');
 
-const ENTRY_POINT = path.join(path.resolve('./src'), 'index.ts');
+const SOURCE_DIR = path.resolve('./src');
+const BACKGROUND_PAGE = path.join(SOURCE_DIR, 'index.ts');
+const CONTENT_SCRIPT = path.join(SOURCE_DIR, 'contentScript.ts');
 const BUILD_PATH = path.join(path.resolve('.', 'build', 'extension'));
 
 module.exports = {
-  entry: ENTRY_POINT,
+  entry: {
+    bundle: BACKGROUND_PAGE,
+    content_script: CONTENT_SCRIPT
+  },
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: BUILD_PATH
   },
   module: {
