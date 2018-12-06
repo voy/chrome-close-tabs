@@ -1,48 +1,47 @@
-import 'mocha';
-import { head, flow, equals, get } from 'lodash/fp';
-import * as sinon from 'sinon';
 import { expect } from 'chai';
+import { head } from 'lodash';
+import { spy, stub, SinonSpy, SinonStub } from 'sinon';
 
 import ContextMenu from '../src/ContextMenu';
-import {decorateTab} from '../src/utils';
+import { decorateTab } from '../src/utils';
 
 function mockTabs() {
-    let tabs: any[] = [];
-
-    for (let i = 0; i < 4; i++) {
-        tabs.push({
-            id: i,
-            index: i,
-            url: 'http://some.domain.com/' + i + '.html'
-        });
-    }
+    let tabs = Object.keys(Array(4).fill(true)).map<chrome.tabs.Tab>((i) => {
+        const id = parseInt(i, 10);
+        return {
+            id: id,
+            index: id,
+            url: `http://some.domain.com/${id}.html`
+        } as any;
+    });
 
     tabs[1].url = 'http://other.domain.org/long/path/file.html';
 
     return tabs;
 }
 
-function mockChromeApi(tabs) {
+function mockChromeApi(tabs: chrome.tabs.Tab[]): Chrome {
     return {
         windows: {
             WINDOW_ID_CURRENT: 'foo'
         },
         tabs: {
-            remove: sinon.stub(),
-            query: sinon.stub().yieldsAsync(tabs)
+            remove: stub(),
+            query: stub().yieldsAsync(tabs),
+            getCurrent: stub().yieldsAsync({} as Tab)
         },
         contextMenus: {
-            removeAll: (callback) => callback(),
-            create: sinon.stub()
+            removeAll: stub().yieldsAsync(),
+            create: stub()
         }
-    };
+    } as any;
 }
 
 function mockMenuItems(): MenuItem[] {
     return [
         {
             title: 'close all',
-            matcher: sinon.spy((tabs) => tabs)
+            matcher: spy((tabs: unknown) => tabs)
         }, {
             title: 'close none',
             matcher: () => []
@@ -56,71 +55,67 @@ function mockMenuItems(): MenuItem[] {
 
 }
 
+async function clickMenuItem(menuItem: chrome.contextMenus.CreateProperties, tab: chrome.tabs.Tab) {
+    menuItem.onclick && await menuItem.onclick(null as any, tab);
+}
+
 describe('ContextMenu', function() {
-    let contextMenu, tabs, chrome, menuItems;
+    let contextMenu;
+    let tabs: chrome.tabs.Tab[];
+    let chrome: Chrome;
+    let menuItems: MenuItem[];
 
-    const currentTab = { url: 'http://something.com/' };
+    const currentTab: chrome.tabs.Tab = { url: 'http://something.com/' } as any;
 
-    function getContextMenuItem(title: string) {
-        return chrome.contextMenus.create.args
+    function getContextMenuItem(title: string): chrome.contextMenus.CreateProperties {
+        return (chrome.contextMenus.create as SinonSpy).args
             .map(head)
             .find(item => item.title.startsWith(title));
     }
 
-    beforeEach(function() {
+    beforeEach(async function() {
         tabs = mockTabs();
         chrome = mockChromeApi(tabs);
         menuItems = mockMenuItems();
 
         contextMenu = new ContextMenu(chrome, menuItems);
-        contextMenu.initialize();
+        await contextMenu.initialize(currentTab);
+    });
+
+    it('removes all existing context menus', () => {
+        expect(chrome.contextMenus.removeAll).to.be.calledOnce;
     });
 
     it('creates context menu items', () => {
-       expect(chrome.contextMenus.create.callCount).to.equal(4);
-    });
-
-    it('creates separator items', () => {
-        chrome.contextMenus.create.reset();
-        contextMenu = new ContextMenu(chrome, [{ type: 'separator' }]);
-        contextMenu.initialize();
-        expect(chrome.contextMenus.create.args[1][0].type).to.eql('separator');
-        expect(chrome.contextMenus.create.callCount).to.equal(2);
+        expect(chrome.contextMenus.create).to.be.calledThrice;
     });
 
     describe('tab closing', () => {
         it('should close all tabs', async function() {
             const menuItem = getContextMenuItem('close all');
-            await menuItem.onclick(null, currentTab);
-            expect(chrome.tabs.remove.args[0][0]).to.eql([0, 1, 2, 3]);
+            await clickMenuItem(menuItem, currentTab);
+            expect(chrome.tabs.remove).to.be.calledWith([0, 1, 2, 3]);
         });
 
         it('should close no tabs', async function() {
             const menuItem = getContextMenuItem('close none');
-            await menuItem.onclick(null, currentTab);
-            expect(chrome.tabs.remove.notCalled).to.equal(true);
+            await clickMenuItem(menuItem, currentTab);
+            expect(chrome.tabs.remove).to.be.calledWith([]);
         });
 
         it('should close second tab', async function() {
             const menuItem = getContextMenuItem('close second');
-            await menuItem.onclick(null, currentTab);
-            expect(chrome.tabs.remove.args[0][0]).to.eql([1]);
+            await clickMenuItem(menuItem, currentTab);
+            expect(chrome.tabs.remove).to.be.calledWith([1]);
         });
     });
 
     describe('matcher call', () => {
-        it('should be called with decorated tabs from the current window', async function() {
+        it('should be passed decorated tabs from the current window and the current tab', async function() {
             const menuItem = getContextMenuItem('close all');
-            await menuItem.onclick(null, currentTab);
-            const calledTabs = menuItems[0].matcher.args[0][0];
-            expect(calledTabs).to.eql(tabs.map(decorateTab));
-        });
+            await clickMenuItem(menuItem, currentTab);
 
-        it('should be called with decorated current tab', async function() {
-            const menuItem = getContextMenuItem('close all');
-            await menuItem.onclick(null, currentTab);
-            const calledCurrentTab = menuItems[0].matcher.args[0][1];
-            expect(calledCurrentTab).to.eql(decorateTab(currentTab as Tab));
+            expect(menuItems[0].matcher).to.be.calledWith(tabs.map(decorateTab), decorateTab(currentTab));
         });
     });
 });

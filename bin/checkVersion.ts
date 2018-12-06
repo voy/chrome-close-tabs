@@ -4,7 +4,7 @@ import * as path from 'path';
 const PACKAGE_JSON = path.resolve(__dirname, '../package.json');
 const MANIFEST_JSON = path.resolve(__dirname, '../manifest.json');
 
-function getVersionFromFile(filename): string {
+function getVersionFromFile(filename: string): string {
     const fileContents = fs.readFileSync(filename).toString();
     return JSON.parse(fileContents).version;
 }

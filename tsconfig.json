@@ -3,9 +3,8 @@
         "module": "commonjs",
         "target": "es2015",
         "baseUrl": "./src",
-        "noImplicitAny": false,
         "sourceMap": false,
-        "strictNullChecks": true
+        "strict": true
     },
     "exclude": ["node_modules"]
 }

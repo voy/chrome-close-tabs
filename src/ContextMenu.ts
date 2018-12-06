@@ -1,56 +1,67 @@
-import * as TabMatchers from './TabMatchers';
-import { decorateTab, getCurrentWindowTabs } from './utils';
+import * as winston from 'winston';
+import { isNumber } from 'lodash';
 
-const MENU_ITEMS: MenuItem[] = [
+import * as TabMatchers from './TabMatchers';
+import { decorateTab, getCurrentWindowTabs, removeAllContextMenus } from './utils';
+import { createLogger } from './logging';
+
+const MENU_ITEM_TEMPLATES: MenuItem[] = [
     {
-        title: 'www.example.com',
-        matcher: TabMatchers.tabsFromDomain
-    },
-    {
-        title: 'www.example.com (keep this tab)',
-        matcher: TabMatchers.otherTabsFromDomain
-    },
-    {
-        type: 'separator'
-    },
-    {
-        title: '*.example.com',
+        title: 'Close "*.{sld}"',
         matcher: TabMatchers.tabsFromSld
     },
     {
-        title: '*.example.com (keep this tab)',
+        title: 'Close "*.{sld}", but keep this tab',
         matcher: TabMatchers.otherTabsFromSld
     },
     {
-        type: 'separator'
+        title: 'Close "{domain}"',
+        matcher: TabMatchers.tabsFromDomain
     },
     {
-        title: 'duplicates (keep first tab)',
+        title: 'Close "{domain}", but keep this tab',
+        matcher: TabMatchers.otherTabsFromDomain
+    },
+    {
+        title: 'Close duplicates, but keep one of each',
         matcher: TabMatchers.duplicates
     }
 ];
 
-function isSeparator(menuItem: MenuItem): menuItem is SeparatorItem {
-    return (menuItem as SeparatorItem).type === 'separator';
-}
+const ALL_CONTEXTS = ['all'];
 
 export default class ContextMenu {
 
-    static CONTEXTS = ['all'];
+    private logger: winston.Logger;
 
-    constructor(private chrome: Chrome,
-                private menuItems: MenuItem[] = MENU_ITEMS) {}
+    constructor(private chrome: Chrome, private itemTemplates = MENU_ITEM_TEMPLATES) {
+        this.logger = createLogger();
+    }
 
-    initialize() {
-        this.chrome.contextMenus.removeAll(() => {
-            this.chrome.contextMenus.create({
-                id: 'root',
-                title: 'TabEraser',
-                contexts: ContextMenu.CONTEXTS
-            });
+    async initialize(tab: chrome.tabs.Tab) {
+        this.logger.log('debug', `Initializing context menu ${tab.url}`);
 
-            this.menuItems.forEach(menuItem => this.createMenuItem(menuItem));
+        await removeAllContextMenus(this.chrome);
+
+        const decoratedTab = decorateTab(tab);
+
+        this.itemTemplates.forEach((itemTemplate) => {
+            const menuItem = this.createMenuItem(itemTemplate, decoratedTab);
+            this.logger.log('debug', 'Creating submenu item', { menuItem });
+            this.chrome.contextMenus.create(menuItem)
         });
+    }
+
+    private createMenuItem(menuItem: MenuItem, activeTab: DecoratedTab): chrome.contextMenus.CreateProperties {
+        let replacedTitle = menuItem.title
+            .replace('{domain}', activeTab.domain)
+            .replace('{sld}', activeTab.sld);
+
+        return {
+            title: replacedTitle,
+            contexts: ALL_CONTEXTS,
+            onclick: this.getClickHandler(menuItem.matcher),
+        };
     }
 
     /**
@@ -59,39 +70,15 @@ export default class ContextMenu {
      * which the test function returns true.
      */
     private getClickHandler(matcher: TabMatcher) {
-        const handler = async function(info, activeTab: Tab) {
+        const handler = async function(this: ContextMenu, _info: any, activeTab: Tab) {
             const tabs = await getCurrentWindowTabs(this.chrome);
 
             const matchingTabs = matcher(tabs, decorateTab(activeTab));
 
-            const tabIds = matchingTabs.map(decoratedTab => decoratedTab.tab.id);
-
-            if (tabIds.length) {
-                this.chrome.tabs.remove(tabIds);
-            }
+            const tabsIdsToRemove = matchingTabs.map(({ tab }) => tab.id).filter(isNumber);
+            this.chrome.tabs.remove(tabsIdsToRemove);
         };
 
         return handler.bind(this);
-    }
-
-    private createMenuItem(menuItem: MenuItem) {
-        if (isSeparator(menuItem)) {
-            this.chrome.contextMenus.create({
-                type: 'separator',
-                parentId: 'root',
-                contexts: ContextMenu.CONTEXTS,
-            });
-
-            return;
-        }
-
-        const { title, matcher } = menuItem;
-
-        this.chrome.contextMenus.create({
-            title: title + Date.now(),
-            contexts: ContextMenu.CONTEXTS,
-            parentId: 'root',
-            onclick: this.getClickHandler(matcher)
-        });
     }
 }

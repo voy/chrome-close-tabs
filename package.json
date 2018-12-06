@@ -1,14 +1,16 @@
 {
   "name": "chrome-close-tabs",
+  "license": "MIT",
   "version": "2.1.5",
   "scripts": {
-    "test": "mocha -r ts-node/register test/**/*.ts",
+    "test": "mocha",
     "clean": "rm -rf build/* && mkdir -p build/extension",
     "copy-assets": "cp -r images build/extension && cp manifest.json build/extension",
     "create-zip": "cp key.pem build/extension && cd build/extension && zip -r ../tab-eraser.zip * && rm key.pem",
     "build": "ts-node bin/checkVersion.ts && npm run test && npm run clean && npm run copy-assets && webpack --config=webpack.config.js && npm run copy-assets",
     "dist": "npm run build && npm run create-zip",
-    "watch": "npm run clean && npm run copy-assets && webpack --watch --config=webpack.config.js"
+    "watch": "npm run clean && npm run copy-assets && webpack --watch --config=webpack.config.js",
+    "foo": "tsc --version"
   },
   "devDependencies": {
     "@types/chai": "^3.5.2",
@@ -16,8 +18,8 @@
     "@types/core-js": "^0.9.41",
     "@types/filesystem": "0.0.28",
     "@types/filewriter": "0.0.28",
-    "@types/lodash": "^4.14.63",
-    "@types/mocha": "^2.2.41",
+    "@types/lodash": "^4.14.119",
+    "@types/mocha": "^2.2.48",
     "@types/node": "^7.0.18",
     "@types/sinon": "^2.2.0",
     "@types/sinon-chai": "^2.7.27",
@@ -25,13 +27,17 @@
     "babel-loader": "^7.0.0",
     "chai": "^3.5.0",
     "chai-sinon": "^2.8.1",
-    "lodash": "^4.17.4",
-    "mocha": "^3.3.0",
+    "lodash": "^4.17.11",
+    "mocha": "^3.5.3",
     "sinon": "^2.1.0",
-    "sinon-chai": "^2.10.0",
-    "ts-loader": "^2.0.3",
-    "ts-node": "^3.0.2",
-    "typescript": "^2.3.2",
-    "webpack": "^2.4.1"
+    "sinon-chai": "^2.14.0",
+    "ts-loader": "^2.3.7",
+    "ts-node": "^3.3.0",
+    "typescript": "^3.2.1",
+    "webpack": "^2.7.0",
+    "@types/shortid": "0.0.29",
+    "@types/winston": "^2.4.4",
+    "shortid": "^2.2.14",
+    "winston": "^3.1.0"
   }
 }

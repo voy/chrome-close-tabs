@@ -1,4 +1,5 @@
 import { flow, split, join, takeRight } from 'lodash/fp';
+import QueryInfo = chrome.tabs.QueryInfo;
 
 function getDomain(url: string): string {
     return url.split(/\/+/g)[1];
@@ -25,11 +26,17 @@ export function decorateTab(tab: Tab): DecoratedTab {
 };
 
 export function getCurrentWindowTabs(chrome: Chrome): Promise<DecoratedTab[]> {
-    let queryInfo = {
+    let queryInfo: QueryInfo = {
         windowId: chrome.windows.WINDOW_ID_CURRENT
     };
 
     return new Promise(resolve => {
         chrome.tabs.query(queryInfo, tabs => resolve(tabs.map(decorateTab)));
+    });
+}
+
+export function removeAllContextMenus(chrome: Chrome) {
+    return new Promise((resolve) => {
+        chrome.contextMenus.removeAll(resolve);
     });
 }
