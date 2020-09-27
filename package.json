@@ -28,7 +28,7 @@
     "babel-loader": "^7.0.0",
     "chai": "^3.5.0",
     "chai-sinon": "^2.8.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "mocha": "^5.2.0",
     "shortid": "^2.2.14",
     "sinon": "^2.1.0",
