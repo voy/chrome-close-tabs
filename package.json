@@ -1,7 +1,7 @@
 {
   "name": "chrome-close-tabs",
   "license": "MIT",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "scripts": {
     "test": "mocha",
     "clean": "rm -rf build/* && mkdir -p build/extension",
@@ -9,8 +9,7 @@
     "create-zip": "cp key.pem build/extension && cd build/extension && zip -r ../tab-eraser.zip * && rm key.pem",
     "build": "ts-node bin/checkVersion.ts && npm run test && npm run clean && npm run copy-assets && webpack --config=webpack.config.js && npm run copy-assets",
     "dist": "npm run build && npm run create-zip",
-    "watch": "npm run clean && npm run copy-assets && webpack --watch --config=webpack.config.js",
-    "foo": "tsc --version"
+    "watch": "npm run clean && npm run copy-assets && webpack --watch --config=webpack.config.js"
   },
   "devDependencies": {
     "@types/chai": "^3.5.2",
